@@ -38,6 +38,7 @@ public class HttpBasicServer extends HttpServer {
 
     private final String user;
     private final String password;
+    private final String realm;
     private final Set<String> whitelist;
     private final String xForwardFor;
     private final boolean log;
@@ -49,6 +50,7 @@ public class HttpBasicServer extends HttpServer {
 
         this.user = settings.get("http.basic.user", "admin");
         this.password = settings.get("http.basic.password", "admin_pw");
+        this.realm = settings.get("http.basic.ralm", "elasticsearch");
         this.whitelist = new HashSet<String>(Arrays.asList(
                 settings.getAsArray("http.basic.ipwhitelist",
                 new String[]{"localhost", "127.0.0.1"})));
@@ -68,16 +70,18 @@ public class HttpBasicServer extends HttpServer {
                     request.header(xForwardFor), request.path(), isInIPWhitelist(request),
                     request.header("X-Client-IP"), request.header("Client-IP"));
 
-        // allow health check even without authorization
-        if (healthCheck(request)) {
-            channel.sendResponse(new StringRestResponse(OK, "{\"OK\":{}}"));
-        } else if (allowOptionsForCORS(request) || authBasic(request) || isInIPWhitelist(request)) {
+        if (allowOptionsForCORS(request) || authBasic(request) || isInIPWhitelist(request)) {
             super.internalDispatchRequest(request, channel);
+        } else if (healthCheck(request)) {
+            // send OK for health check without authorization
+            channel.sendResponse(new StringRestResponse(OK, "{\"OK\":true,\"message\":\"Authentication Required\"}"));
         } else {
             String addr = getAddress(request);
             Loggers.getLogger(getClass()).error("UNAUTHORIZED type:{}, address:{}, path:{}, request:{}, content:{}, credentials:{}",
                     request.method(), addr, request.path(), request.params(), request.content().toUtf8(), getDecoded(request));
-            channel.sendResponse(new StringRestResponse(UNAUTHORIZED, "Authentication Required"));
+            StringRestResponse response = new StringRestResponse(UNAUTHORIZED, "Authentication Required");
+            response.addHeader("WWW-Authenticate", "Basic realm='" + realm + "'");
+            channel.sendResponse(response);
         }
     }
 

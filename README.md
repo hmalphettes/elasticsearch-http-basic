@@ -28,9 +28,15 @@ $ curl -v --user my_username:my_password localhost:9200/foo # works
 $ curl -v --user my_username:password localhost:9200/foo # sends 401
 ```
 
-## Problems
+## Problems: Elasticsearch version and build
 
-This will not send WWW-Authorize headers - this is due to elasticsearch not allowing to add custom headers to responses.
+This version of the plugin sends the 'WWW-Authorize' header.
+
+However it requires a branch of elastic-search that supports setting custom http-headers to response:
+https://github.com/elasticsearch/elasticsearch/pull/2936
+
+Once this is merged, this version of the plugin will require version 0.90.0.RC3
+Please vote on the [PR] (https://github.com/elasticsearch/elasticsearch/pull/2936) to make sure it happens.
 
 ## Issues
 
