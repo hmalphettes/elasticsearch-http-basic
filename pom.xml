@@ -4,7 +4,7 @@
 
     <groupId>com.asquera.elasticsearch</groupId>
     <artifactId>http-basic</artifactId>
-    <version>0.90.0.RC3-SNAPSHOT</version>
+    <version>0.90.0.httpheaders</version>
     <packaging>jar</packaging>
 
     <name>Basic Authentication Plugin</name>
@@ -12,7 +12,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <elasticsearch.version>0.90.0.RC3h</elasticsearch.version>
+        <elasticsearch.version>0.90.0.httpheaders</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -84,4 +84,12 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-hmalphettes-elasticsearch-custom-headers-elasticsearch</id>
+            <name>hmalphettes-elasticsearch-custom-headers-elasticsearch</name>
+            <url>https://api.bintray.com/maven/hmalphettes/elasticsearch-custom-headers/elasticsearch</url>
+        </repository>
+    </distributionManagement>    
 </project>
