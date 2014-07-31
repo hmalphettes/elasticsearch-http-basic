@@ -29,7 +29,7 @@ import org.elasticsearch.rest.RestRequest.Method;
 // # EITHER $.ajaxSetup({ headers: { 'Authorization': "Basic " + credentials }});
 // # OR use beforeSend in  $.ajax({
 // http.cors.allow-headers: "X-Requested-With, Content-Type, Content-Length, Authorization"
-// 
+//
 /**
  * @author Florian Gilcher (florian.gilcher@asquera.de)
  * @author Peter Karich
@@ -53,7 +53,7 @@ public class HttpBasicServer extends HttpServer {
                 settings.getAsArray("http.basic.ipwhitelist",
                 new String[]{"localhost", "127.0.0.1"})));
 
-        // for AWS load balancers it is X-Forwarded-For -> hmmh does not work 
+        // for AWS load balancers it is X-Forwarded-For -> hmmh does not work
         this.xForwardFor = settings.get("http.basic.xforward", "");
         this.log = settings.getAsBoolean("http.basic.log", false);
         Loggers.getLogger(getClass()).info("using {}:{} with whitelist {}, xforward {}",
@@ -69,10 +69,10 @@ public class HttpBasicServer extends HttpServer {
                     request.header("X-Client-IP"), request.header("Client-IP"));
 
         // allow health check even without authorization
-        if (healthCheck(request)) {
-            channel.sendResponse(new BytesRestResponse(OK, "{\"OK\":{}}"));
-        } else if (allowOptionsForCORS(request) || authBasic(request) || isInIPWhitelist(request)) {
+        if (allowOptionsForCORS(request) || authBasic(request) || isInIPWhitelist(request)) {
             super.internalDispatchRequest(request, channel);
+        } else if (healthCheck(request)) {
+            channel.sendResponse(new BytesRestResponse(OK, "{\"OK\":{}}"));
         } else {
             String addr = getAddress(request);
             Loggers.getLogger(getClass()).error("UNAUTHORIZED type:{}, address:{}, path:{}, request:{}, content:{}, credentials:{}",
